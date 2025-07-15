@@ -1,0 +1,66 @@
+{
+  "name": "Buscar Promoções Promobit",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual_trigger",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.promobit.com.br/api/v1/search?search=celular&limit=5",
+        "responseFormat": "json",
+        "options": {
+          "headers": {
+            "User-Agent": "Mozilla/5.0"
+          }
+        }
+      },
+      "id": "http_request",
+      "name": "Buscar Promobit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "mode": "mergeByIndex",
+        "values": {
+          "string": [
+            {
+              "name": "mensagem",
+              "value": "📱 Oferta: {{$json[\"title\"]}}\\n💰 R$ {{$json[\"price\"]}}\\n🔗 https://www.promobit.com.br/oferta/{{$json[\"slug\"]}}"
+            }
+          ]
+        }
+      },
+      "id": "set_node",
+      "name": "Formatar Mensagem",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {},
+      "id": "debug_node",
+      "name": "Mostrar Resultado",
+      "type": "n8n-nodes-base.debug",
+      "typeVersion": 1,
+      "position": [850, 300]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [[{"node": "Buscar Promobit", "type": "main", "index": 0}]]
+    },
+    "Buscar Promobit": {
+      "main": [[{"node": "Formatar Mensagem", "type": "main", "index": 0}]]
+    },
+    "Formatar Mensagem": {
+      "main": [[{"node": "Mostrar Resultado", "type": "main", "index": 0}]]
+    }
+  }
+}
